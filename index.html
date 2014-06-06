@@ -23,10 +23,16 @@
 
 </div>
 
+
+
 <div>
     <!-- Editor and code box are synced -->
     <div id="code-box">
 log("Started Game!");
+
+world.color = Colors.GREY;
+var WORLD_WIDTH = world.width;
+var WORLD_HEIGHT = world.height;
 
 var playerPaddle = Rectangle({
     x: 10, y: 10,
@@ -42,7 +48,7 @@ var computerScore = 0;
 var score = Text({
     x: (WORLD_WIDTH / 2) - 80,
     y: 24,
-    text: "Player 0 - Computer 0"
+    text: "Player " + playerScore + " - Computers " + computerScore
 });
 
 var computerPaddle = Rectangle({
@@ -80,11 +86,11 @@ function update() {
 }
 
 function movePlayer() {
-    if (keysDown[Keys.UP] && (playerPaddle.y) > 0) {
+    if (keysDown.contains(Keys.UP) && (playerPaddle.y) > 0) {
         playerPaddle.y -= playerPaddle.velocity;
     }
 
-    if (keysDown[Keys.DOWN] && (playerPaddle.y + playerPaddle.height) < WORLD_HEIGHT) {
+    if (keysDown.contains(Keys.DOWN) && (playerPaddle.y + playerPaddle.height) < WORLD_HEIGHT) {
         playerPaddle.y += playerPaddle.velocity;
     }
 }

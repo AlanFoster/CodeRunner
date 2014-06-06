@@ -26,14 +26,8 @@ $(function () {
             var codeBoxId = runner.attr("intepreter-code-box");
 
             runner.click((function (codeBoxId, debugId, environment) {
-                var isFirstRun = true;
                 return function () {
-                    if (!isFirstRun) {
-                        console.log("Destoying");
-                        environment.destroy();
-                    }
-                    isFirstRun = false;
-
+                    environment.destroy();
                     environment.setUp();
 
                     var codeBoxEditor = ace.edit(codeBoxId);
@@ -54,4 +48,12 @@ $(function () {
 
     bindCodeRunners();
     bindApi();
+});
+
+
+// Disable scrolling keys moving the browser
+$(window).keydown(function (event) {
+    if([37, 38, 39, 40].indexOf(event.which) > -1) {
+        return false;
+    };
 });

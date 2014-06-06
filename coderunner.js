@@ -44,7 +44,8 @@ var codeRunner = (function (codeRunner) {
         RED: "#FF0000",
         GREEN: "#00FF00",
         BLUE: "#0000FF",
-        BLACK: "#000000"
+        BLACK: "#000000",
+        GREY: "#CCCCCC"
     };
 
     var Keys = {
@@ -155,25 +156,32 @@ var codeRunner = (function (codeRunner) {
         }, {
             clear: function () {
                 count = 1;
-                target.html();
+                target.html("");
             }
         });
     };
 
     // A custom environment for each debugging example
     function Environment(container, debugTarget) {
-        var WORLD_WIDTH;
-        var WORLD_HEIGHT;
+        var world = {
+            color: Colors.GREY,
+            // Computed on setup
+            width: 0,
+            height: 0
+        };
+
         var context;
         var gameLoop;
         var keysDown = {};
+        keysDown.contains = function(key) { return this[key]; };
 
-        window.addEventListener("keydown", function (event) {
-            keysDown[event.keyCode] = true;
+        $(window).keydown(function (event) {
+            keysDown[event.which] = true;
+            return true;
         });
 
-        window.addEventListener("keyup", function (event) {
-            delete keysDown[event.keyCode];
+        $(window).keyup(function (event) {
+            delete keysDown[event.which];
         });
 
         var logger = (function (target) {
@@ -204,7 +212,7 @@ var codeRunner = (function (codeRunner) {
 
                 var val = props[prop];
                 obj[prop] = val;
-                logger.log("Creating property " + prop + " with value " + val);
+                logger.debug("Creating property " + prop + " with value " + val);
             }
 
             return obj;
@@ -288,7 +296,7 @@ var codeRunner = (function (codeRunner) {
 
             function Circle(attributes) {
                 logger.log("Creating Circle!");
-                bindProperties(this, defaults, attributes)
+                bindProperties(this, defaults, attributes);
                 logger.log("Successfully created Circle!");
             }
 
@@ -326,7 +334,7 @@ var codeRunner = (function (codeRunner) {
         function render(context, width, height) {
             if (!context) return;
 
-            context.fillStyle = "#FF00FF";
+            context.fillStyle = world.color;
             context.fillRect(0, 0, width, height);
 
             // Draw entities as expected
@@ -340,11 +348,11 @@ var codeRunner = (function (codeRunner) {
                 // Create a graphical component for our container
                 var canvas = document.createElement("canvas");
 
-                WORLD_WIDTH = Math.ceil(container.width());
-                WORLD_HEIGHT = Math.ceil(container.height());
+                world.width = Math.ceil(container.width());
+                world.height = Math.ceil(container.height());
 
-                canvas.width = WORLD_WIDTH;
-                canvas.height = WORLD_HEIGHT;
+                canvas.width = world.width;
+                canvas.height = world.height;
 
                 // Set the global context
                 context = canvas.getContext("2d");
