@@ -1,0 +1,29 @@
+.logging-container {
+    width: 500px;
+    height: 100px;
+    border: 1px solid red;
+    overflow-y: scroll
+}
+
+.logging-log {
+    color: blue;
+}
+
+.logging-debug {
+    color: pink;
+}
+
+.logging-error {
+    color: red;
+}
+
+.environment {
+    border: 1px solid blue;
+    width: 800px;
+    height: 350px;
+}
+
+#code-box {
+    width: 1000px;
+    height: 200px;
+}

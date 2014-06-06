@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+
+    <link href="style.css" rel="stylesheet"/>
+</head>
+<body>
+
+<div>
+    <input type="button" value="Run Code"
+           intepreter-runner
+           intepreter-code-box="code-box"
+           intepreter-target="#code-result"
+           intepreter-debugger="#debug-window"
+           intepreter-stop="#stop"
+            />
+    <input type="button" value="Stop Running" id="stop"/>
+</div>
+
+<div intepreter-api>
+
+</div>
+
+<div>
+    <!-- Editor and code box are synced -->
+    <div id="code-box">
+log("Started Game!");
+
+var playerPaddle = Rectangle({
+    x: 10, y: 10,
+    width: 20, height: 100,
+    color: Colors.GREEN,
+    velocity: 10
+});
+
+// Keeping track of the scores
+var playerScore = 0;
+var computerScore = 0;
+
+var score = Text({
+    x: (WORLD_WIDTH / 2) - 80,
+    y: 24,
+    text: "Player 0 - Computer 0"
+});
+
+var computerPaddle = Rectangle({
+    x: WORLD_WIDTH - 30, y: 10,
+    width: 20, height: 100,
+    color: Colors.GREEN,
+    velocity: 8
+});
+
+var ball_radius = 10;
+var ball_velocity = 10;
+var ball = Circle({
+    x: (WORLD_WIDTH / 2) - (ball_radius / 2),
+    y: (WORLD_HEIGHT / 2) - (ball_radius / 2),
+    radius: ball_radius,
+    x_velocity: -ball_velocity,
+    y_velocity: ball_velocity
+});
+
+// Start the ball in the middle
+resetBall();
+
+function update() {
+    // Update the ball's position
+    updateBall();
+
+    // Check to see if anyone has one, and restart the game if they have
+    checkWinners();
+
+    // Human Controlling
+    movePlayer();
+
+    // Computer AI Mechanism for the paddle
+    moveComputer();
+}
+
+function movePlayer() {
+    if (keysDown[Keys.UP] && (playerPaddle.y) > 0) {
+        playerPaddle.y -= playerPaddle.velocity;
+    }
+
+    if (keysDown[Keys.DOWN] && (playerPaddle.y + playerPaddle.height) < WORLD_HEIGHT) {
+        playerPaddle.y += playerPaddle.velocity;
+    }
+}
+
+function moveComputer() {
+    var centerOfPaddle = computerPaddle.y + (computerPaddle.height / 2)
+
+    // Only begin to move the computer if the ball is more than half way across the game
+    if(ball.x > WORLD_WIDTH / 2) {
+        if (ball.y > centerOfPaddle) {
+            computerPaddle.y += computerPaddle.velocity;
+        } else {
+            computerPaddle.y -= computerPaddle.velocity;
+        }
+    }
+}
+
+function updateBall() {
+    // Update the ball position
+    ball.x += ball.x_velocity;
+    ball.y += ball.y_velocity;
+
+    // Check if we need to bounce on the top or bottom
+    if(ball.y <= 0 || ball.y >= WORLD_HEIGHT){
+        ball.y_velocity *= - 1;
+    }
+
+    // Check if we have bounced off a paddle or computer
+    if(ball.collidesWith(playerPaddle) || ball.collidesWith(computerPaddle) ) {
+        ball.x_velocity *= -1;
+    }
+}
+
+function checkWinners() {
+    var ballPastPlayer = ball.x < 0;
+    var ballPastComputer = ball.x > WORLD_WIDTH;
+    if (ballPastPlayer|| ballPastComputer) {
+        // Decide who gets the points!
+        if(ballPastPlayer) {
+            computerScore++;
+        } else if(ballPastComputer) {
+            playerScore++;
+        }
+
+        // Update the score text
+        score.text = "Player " + playerScore + " - Computers " + computerScore;
+        resetBall();
+    }
+}
+
+function resetBall() {
+    // restart the ball position in the center of the world
+    ball.x = (WORLD_WIDTH / 2) - (ball_radius / 2);
+    ball.y = (WORLD_HEIGHT / 2) - (ball_radius / 2);
+
+    ball.x_velocity = -ball_velocity;
+    ball.y_velocity = ball_velocity;
+}
+
+    </div>
+</div>
+
+<div>
+    [Result]
+    <div id="code-result" class="environment">
+        Waiting for new program...
+    </div>
+</div>
+
+<div>
+    [Logging Window]
+    <div id="debug-window" class="logging-container">
+        Waiting for new program...
+    </div>
+</div>
+
+<script src="jquery.js" type="text/javascript"></script>
+<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+    var editor = ace.edit("code-box");
+    editor.setTheme("ace/theme/monokai");
+    editor.getSession().setMode("ace/mode/javascript");
+</script>
+<script src="coderunner.js"></script>
+<script src="binding.js"></script>
+<script>
+    // Fake a click of the run button for debugging purposes
+    setTimeout(function () {
+        var runners = document.querySelectorAll("[intepreter-runner]");
+        [].forEach.bind(runners, function (runner) {
+            runner.click()
+        })()
+    }, 100);
+</script>
+</body>
+</html>
