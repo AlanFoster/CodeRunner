@@ -1,0 +1,21 @@
+{
+  "name": "CodeRunner",
+  "main": "index.html",
+  "version": "0.0.0",
+  "homepage": "https://github.com/AlanFoster/CodeRunner",
+  "authors": [
+    "Alan Foster"
+  ],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.1",
+    "ace-builds": "~1.1.3"
+  }
+}
