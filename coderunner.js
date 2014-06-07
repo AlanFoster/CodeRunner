@@ -55,46 +55,7 @@ var codeRunner = (function (codeRunner) {
         DOWN: 40
     };
 
-
-    var availableEntities = {
-        "Rectangle": {
-            "description": "Creates a new Rectangle",
-            "defaults": {
-                "x": {"default": 10, "description": "Defines X, the top left position of this shape"},
-                "y": {"default": 20, "description": "Defines Y, the top left position of this shape"},
-
-                "width": {"default": 100, "description": "Defines the width of this shape"},
-                "height": {"default": 100, "description": "Defines the height of this shape"},
-
-                "color": {"default": Colors.BLUE, "description": "The color that this shape will be. Notice how it is spelt 'color', with American spelling."}
-            }
-        },
-
-        "Text": {
-            "description": "Creates a new piece of Text label",
-            "defaults": {
-                "x": {"default": 50, "description": "Defines X, the top left position of this shape"},
-                "y": {"default": 50, "description": "Defines Y, the top left position of this shape"},
-              
-			    // TODO Hardcoded - could be automatically generated when text is set.
-                "width": {"default": 100, "description": "Defines the width of this shape"},
-                "height": {"default": 20, "description": "Defines the height of this shape"},
-
-                "color": {"default": Colors.BLACK, "description": "The color that this shape will be. Notice how it is spelt 'color', with American spelling."},
-                "text": {"default": "[Text Label]", "description": "The text to show the user"}
-            }
-        },
-
-        "Circle": {
-            "description": "Creates a new Rectangle",
-            "defaults": {
-                "x": {"default": 50, "description": "Defines X, the top left position of this shape"},
-                "y": {"default": 50, "description": "Defines Y, the top left position of this shape"},
-                "radius": {"default": 40, "description": "The radius of the circle"},
-                "color": {"default": Colors.BLUE, "description": "The color that this shape will be. Notice how it is spelt 'color', with American spelling."}
-            }
-        }
-    };
+    var availableEntities = [];
 	
     // Expose the available API
     codeRunner.api = [];
@@ -102,7 +63,6 @@ var codeRunner = (function (codeRunner) {
     codeRunner.api.push({availableEntities: availableEntities});
     codeRunner.api.push({colors: Colors});
     codeRunner.api.push({keys: Keys});
-
 
     var SUPPORTED_LOGGERS = [
         "log",
@@ -192,6 +152,14 @@ var codeRunner = (function (codeRunner) {
             }
         })(debugTarget);
 
+        // Bind the available logging functions to this scope
+        // Ie so it can be access with `log("...")` for the end user
+/*        $.each(SUPPORTED_LOGGERS, function(i, loggingType) {
+            self[loggingType] = function(args) {
+                logger[loggingType](args)
+            }
+        });*/
+
         var log = function (args) {
             logger.log(args);
         };
@@ -202,130 +170,160 @@ var codeRunner = (function (codeRunner) {
             logger.error(args)
         };
 
-        var entities = [];
+        var worldEntities = [];
 
-        function bindProperties(obj, defaults, attributes) {
-            var props = $.extend(defaults, attributes)
+        var Entity = (function(availableEntities, worldEntities){
+            function bindProperties(obj, defaults, attributes) {
+                var props = $.extend(defaults, attributes)
 
-            for (var prop in props) {
-                if (!props.hasOwnProperty(prop)) continue;
+                for (var prop in props) {
+                    if (!props.hasOwnProperty(prop)) continue;
 
-                var val = props[prop];
-                obj[prop] = val;
-                logger.debug("Creating property " + prop + " with value " + val);
+                    var val = props[prop];
+                    obj[prop] = val;
+                    logger.debug("Creating property " + prop + " with value " + val);
+                }
+
+                return obj;
             }
 
-            return obj;
-        }
-
-        function mapDefaults(defaults) {
-            var result = [];
-            for(var key in defaults) {
-                result[key] = defaults[key].default;
-            }
-            return result;
-        }
-
-		// TODO Write base entity.
-		
-        var Rectangle = (function () {
-            var defaults = mapDefaults(availableEntities.Rectangle.defaults)
-
-            function Rectangle(attributes) {
-                logger.log("Creating Rectangle!");
-                bindProperties(this, defaults, attributes);
-                logger.log("Successfully created Rectangle!");
+            function mapDefaults(defaults) {
+                var result = [];
+                for(var key in defaults) {
+                    result[key] = defaults[key].default;
+                }
+                return result;
             }
 
-            Rectangle.prototype = {
-                render: function (context, width, height) {
-                    context.fillStyle = this.color;
-                    context.fillRect(this.x, this.y, this.width, this.height)
-                },
+            function Entity(){
+
+            }
+
+            Entity.prototype = {
                 collidesWith: function(other) {
                     var thisBounds = this.getBounds();
                     var otherBounds = other.getBounds();
                     return thisBounds.intersectsAABB(otherBounds)
                 },
-                getBounds: function() {
-                    return new AABB(this.x, this.y, this.x + this.width, this.y + this.height)
+                getBounds: function(){
+                    return new AABB(this.x, this.y, 0, 0);
+                },
+                render: function(context) {
+                    // noop
                 }
             };
 
-            return function (attributes) {
-                var instance = new Rectangle(attributes);
-                entities.push(instance);
-                return instance;
+            Entity.extend = function(details) {
+                var name = details.name;
+                var description = details.description;
+                var defaults = details.defaults;
+                var functions = details.functions;
+
+                // Make this new entity information available within the APIs
+                availableEntities.push({
+                    name: name,
+                    description: description,
+                    defaults: defaults
+                });
+
+                var mappedDefaults = mapDefaults(details.defaults);
+
+                var F = function(attrs){
+                    logger.debug("Creating a new : " + name);
+                    bindProperties(this, mappedDefaults, attrs);
+                    logger.debug("Created a new : " + name);
+                };
+
+                F.prototype = functions;
+                for(var key in Entity.prototype){
+                    if(!F.prototype.hasOwnProperty(key)) {
+                        F.prototype[key] = Entity.prototype[key]
+                    }
+                }
+
+                return function(attributes) {
+                    var instance = new F(attributes);
+                    worldEntities.push(instance);
+                    return instance;
+                };
+            };
+
+            return Entity;
+        })(availableEntities, worldEntities);
+
+        var Rectangle = Entity.extend({
+            name: "Rectangle",
+            description: "Creates a new Rectangle",
+            functions: {
+                render: function (context) {
+                    context.fillStyle = this.color;
+                    context.fillRect(this.x, this.y, this.width, this.height)
+                },
+                getBounds: function () {
+                    return new AABB(this.x, this.y, this.x + this.width, this.y + this.height)
+                }
+            },
+            defaults: {
+                "x": {"default": 10, "description": "Defines X, the top left position of this shape"},
+                "y": {"default": 20, "description": "Defines Y, the top left position of this shape"},
+
+                "width": {"default": 100, "description": "Defines the width of this shape"},
+                "height": {"default": 100, "description": "Defines the height of this shape"},
+
+                "color": {"default": Colors.BLUE, "description": "The color that this shape will be. Notice how it is spelt 'color', with American spelling."}
             }
-        })();
+        });
 
-        var Text = (function () {
-            var defaults = mapDefaults(availableEntities.Text.defaults)
-
-            function Text(attributes) {
-                logger.log("Creating Text!");
-                bindProperties(this, defaults, attributes);
-                logger.log("Successfully created Text!");
-            }
-
-            Text.prototype = {
-                render: function (context, width, height) {
+        var Text = Entity.extend({
+            name: "Text",
+            description: "Creates a Text label",
+            functions: {
+                render: function (context) {
                     context.fillStyle = this.color;
                     context.font = this.size + 'pt Calibri';
                     context.fillText(this.text, this.x, this.y)
                 },
-                collidesWith: function(other) {
-                    var thisBounds = this.getBounds();
-                    var otherBounds = other.getBounds();
-                    return thisBounds.intersectsAABB(otherBounds)
-                },
-                getBounds: function() {
+                getBounds: function () {
                     return new AABB(this.x, this.y, this.x + this.width, this.y + this.height)
                 }
-            };
+            },
+            defaults: {
+                "x": {"default": 50, "description": "Defines X, the top left position of this shape"},
+                "y": {"default": 50, "description": "Defines Y, the top left position of this shape"},
 
-            return function (attributes) {
-                var instance = new Text(attributes);
-                entities.push(instance);
-                return instance;
+                // TODO Hardcoded - could be automatically generated when text is set.
+                "width": {"default": 100, "description": "Defines the width of this shape"},
+                "height": {"default": 20, "description": "Defines the height of this shape"},
+
+                "color": {"default": Colors.BLACK, "description": "The color that this shape will be. Notice how it is spelt 'color', with American spelling."},
+                "text": {"default": "[Text Label]", "description": "The text to show the user"}
             }
-        })();
+        });
 
-        var Circle = (function () {
-            var defaults = mapDefaults(availableEntities.Circle.defaults)
-
-            function Circle(attributes) {
-                logger.log("Creating Circle!");
-                bindProperties(this, defaults, attributes);
-                logger.log("Successfully created Circle!");
-            }
-
-            Circle.prototype = {
-                render: function (context, width, height) {
+        var Circle = Entity.extend({
+            name: "Circle",
+            description: "Creates a new Rectangle",
+            functions: {
+                render: function (context) {
                     context.beginPath();
                     context.arc(this.x, this.y, this.radius, 2 * Math.PI, false);
                     context.fillStyle = this.color;
                     context.fill();
                 },
-                collidesWith: function(other) {
-                    var thisBounds = this.getBounds();
-                    var otherBounds = other.getBounds();
-                    return thisBounds.intersectsAABB(otherBounds)
-                },
-                getBounds: function() {
+                getBounds: function () {
                     var x = this.x - this.radius;
                     var y = this.y - this.radius;
 
                     return new AABB(x, y, x + (this.radius * 2), y + (this.radius * 2));
                 }
-            };
-
-            return function (attributes) {
-                var instance = new Circle(attributes);
-                entities.push(instance);
-                return instance;
+            },
+            defaults: {
+                "x": {"default": 50, "description": "Defines X, the top left position of this shape"},
+                "y": {"default": 50, "description": "Defines Y, the top left position of this shape"},
+                "radius": {"default": 40, "description": "The radius of the circle"},
+                "color": {"default": Colors.BLUE, "description": "The color that this shape will be. Notice how it is spelt 'color', with American spelling."}
             }
-        })();
+        });
 
         function update() {
             // noop implementation by default
@@ -338,7 +336,7 @@ var codeRunner = (function (codeRunner) {
             context.fillRect(0, 0, width, height);
 
             // Draw entities as expected
-            entities.forEach(function (entity, width, height) {
+            worldEntities.forEach(function (entity) {
                 entity.render(context)
             })
         }
@@ -376,7 +374,7 @@ var codeRunner = (function (codeRunner) {
                 gameLoop = setInterval(function () {
                     try {
                         update();
-                        render(context, WORLD_WIDTH, WORLD_HEIGHT)
+                        render(context, world.width, world.height)
                     } catch (e) {
                         console.log(e);
                         logger.error("Error :: " + e.stack);
@@ -384,6 +382,7 @@ var codeRunner = (function (codeRunner) {
                 }, 40);
             },
             destroy: function (keepLogs) {
+
                 if(gameLoop) {
                     clearInterval(gameLoop);
                 }
@@ -391,7 +390,7 @@ var codeRunner = (function (codeRunner) {
                 if (!keepLogs) {
                     logger.clear()
                 }
-                entities.splice(0, entities.length)
+                worldEntities.splice(0, worldEntities.length)
             }
         };
     }
