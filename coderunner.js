@@ -62,7 +62,7 @@ var codeRunner = (function (codeRunner) {
 
     api.push({
         name: "Available Entities",
-        description: "All information about the objects which can be created with this application",
+        description: "Creating entities",
         todoNameMe: availableEntities
     });
     api.push({

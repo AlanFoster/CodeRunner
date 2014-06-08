@@ -1,6 +1,6 @@
 .logging-container {
     height: 100px;
-    border: 1px solid red;
+    border: 1px solid #CCCCCC;
     overflow-y: scroll
 }
 
@@ -17,8 +17,8 @@
 }
 
 .environment {
-    border: 1px solid blue;
-    height: 275px;
+    border: 1px solid #CCCCCC;
+    height: 280px;
 }
 
 #code-box {
@@ -27,4 +27,8 @@
 
 .red {
     color: #FF0000
+}
+
+.view {
+    margin-top: 70px;
 }

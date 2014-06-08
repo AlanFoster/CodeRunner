@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Document</title>
+    <title>Code Editor</title>
 
     <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="style.css" rel="stylesheet"/>
@@ -10,7 +10,7 @@
 <body>
 
 
-<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+<div class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
             <!-- Toggle bar which appears when less than the appropriate size -->
@@ -34,15 +34,14 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li>
-                    <a href="#" title="View API">
-                        <span class="glyphicon glyphicon-search"></span>
+                    <a href="#" class="view-api" title="View API" data-toggle="modal" data-target="#apiModal">
+                        <span class="glyphicon glyphicon-question-sign"></span>
                     </a>
                 </li>
             </ul>
         </div>
     </div>
 </div>
-
 
 <script id="api-detail" type="text/template">
     <div>
@@ -117,7 +116,29 @@
     </div>
 </script>
 
-<h3>Tutorial</h3>
+<div class="modal fade" id="apiModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">Api Overview</h4>
+            </div>
+            <div class="modal-body">
+                The following functions have been defined for this demonstration.
+                <div intepreter-api>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="view">
+
+
 <div id="tutorial-box">
     <div class="col-md-4">
         <div class="page">
@@ -169,9 +190,9 @@
                 var circle = Circle({
                     x: 10,
                     y: 20
-                    });
+                });
 
-                    function update() {
+                function update() {
                     circle.x += 5;
                     circle.y += 5;
                 }
@@ -338,12 +359,10 @@
 
 
     <div>
-        <!-- Editor and code box are synced -->
         <div id="code-box">
 
         </div>
     </div>
-
     <div>
         <div class="text-center">Canvas</div>
         <div id="code-result" class="environment">
@@ -359,15 +378,6 @@
     </div>
 
 </div>
-
-
-
-<div>
-    <h3>Functions</h3>
-    <div intepreter-api>
-
-    </div>
-
 </div>
 
 </body>
