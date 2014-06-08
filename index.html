@@ -48,6 +48,14 @@
     </div>
 </script>
 
+<script id="code-editor-template" type="text/template">
+    <input type="button" class="copyCode" value="copy"/>
+    <div <%= "id='" + id + "'" %>>
+        <%= code %>
+    </div>
+</script>
+
+
 <script id="api-overview" type="text/template">
     <div style="border: 1px solid red; margin: 5px;">
         <%= name %> - <%= description %>
@@ -85,17 +93,153 @@
             var rectangle = Rectangle({
                 x: 10,
                 y: 20
-            })
+            });
         </div>
 
+        <div>You can also create circles with</div>
 
         <div code-example>
-            var circle = circle({
+            var circle = Circle({
                 x: 50,
                 y: 50,
                 color: Colors.RED
-            })
+            });
         </div>
+
+    </div>
+    <div class="page">
+        <h2>The End</h2>
+        <div>We hope you enjoyed yourself.</div>
+        <div>Your final code should look like:</div>
+        <div code-example>
+            log("Started Game!");
+
+            world.color = Colors.GREY;
+            var WORLD_WIDTH = world.width;
+            var WORLD_HEIGHT = world.height;
+
+            var playerPaddle = Rectangle({
+                x: 10, y: 10,
+                width: 20, height: 100,
+                color: Colors.GREEN,
+                velocity: 10
+            });
+
+            // Keeping track of the scores
+            var playerScore = 0;
+            var computerScore = 0;
+
+            var score = Text({
+                x: (WORLD_WIDTH / 2) - 80,
+                y: 24,
+                text: "Player " + playerScore + " - Computers " + computerScore
+            });
+
+            var computerPaddle = Rectangle({
+                x: WORLD_WIDTH - 30, y: 10,
+                width: 20, height: 100,
+                color: Colors.GREEN,
+                velocity: 8
+            });
+
+            var ball_radius = 10;
+            var ball_velocity = 10;
+            var ball = Circle({
+                x: (WORLD_WIDTH / 2) - (ball_radius / 2),
+                y: (WORLD_HEIGHT / 2) - (ball_radius / 2),
+                radius: ball_radius,
+                x_velocity: -ball_velocity,
+                y_velocity: ball_velocity
+            });
+
+            // Start the ball in the middle
+            resetBall();
+
+            function update() {
+                // Update the ball's position
+                updateBall();
+
+                // Check to see if anyone has one, and restart the game if they have
+                checkWinners();
+
+                // Human Controlling
+                movePlayer();
+
+                // Computer AI Mechanism for the paddle
+                moveComputer();
+            }
+
+            function movePlayer() {
+                if (keysDown.contains(Keys.UP) && (playerPaddle.y) > 0) {
+                    playerPaddle.y -= playerPaddle.velocity;
+                }
+
+                if (keysDown.contains(Keys.DOWN) && (playerPaddle.y + playerPaddle.height) < WORLD_HEIGHT) {
+                    playerPaddle.y += playerPaddle.velocity;
+                }
+            }
+
+            function moveComputer() {
+                var centerOfPaddle = computerPaddle.y + (computerPaddle.height / 2)
+
+                // Only begin to move the computer if the ball is more than half way across the game
+                if(ball.x > WORLD_WIDTH / 2) {
+                    if (ball.y > centerOfPaddle) {
+                        computerPaddle.y += computerPaddle.velocity;
+                    } else {
+                        computerPaddle.y -= computerPaddle.velocity;
+                    }
+                }
+            }
+
+            function updateBall() {
+                // Update the ball position
+                ball.x += ball.x_velocity;
+                ball.y += ball.y_velocity;
+
+                // Check if we need to bounce on the top or bottom
+                if(ball.y <= 0 || ball.y >= WORLD_HEIGHT){
+                    ball.y_velocity *= - 1;
+                }
+
+                // Check if we have bounced off a paddle or computer
+                if(ball.collidesWith(playerPaddle) || ball.collidesWith(computerPaddle) ) {
+                    ball.x_velocity *= -1;
+                }
+            }
+
+            function checkWinners() {
+                var ballPastPlayer = ball.x < 0;
+                var ballPastComputer = ball.x > WORLD_WIDTH;
+                if (ballPastPlayer|| ballPastComputer) {
+                    // Decide who gets the points!
+                    if(ballPastPlayer) {
+                        computerScore++;
+                    } else if(ballPastComputer) {
+                        playerScore++;
+                    }
+
+                    // Update the score text
+                    score.text = "Player " + playerScore + " - Computers " + computerScore;
+                    resetBall();
+                }
+            }
+
+            function resetBall() {
+                // restart the ball position in the center of the world
+                ball.x = (WORLD_WIDTH / 2) - (ball_radius / 2);
+                ball.y = (WORLD_HEIGHT / 2) - (ball_radius / 2);
+
+                ball.x_velocity = -ball_velocity;
+                ball.y_velocity = ball_velocity;
+            }
+        </div>
+    </div>
+</div>
+
+<div>
+    <h3>Functions</h3>
+    <div intepreter-api>
 
     </div>
 </div>
@@ -110,14 +254,6 @@
             />
     <input type="button" value="Stop Running" id="stop"/>
 </div>
-
-<div>
-    <h3>Functions</h3>
-    <div intepreter-api>
-
-    </div>
-</div>
-
 
 
 <div>

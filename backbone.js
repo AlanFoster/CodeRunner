@@ -160,3 +160,59 @@ var apiView = new ApiView({
 })
 
 apiView.render();
+
+
+var CodeExample = (function() {
+    var createId = (function() {
+        var id = 0;
+        return function() {
+            id++;
+            return "CodeExample-" + id;
+        }
+    })();
+
+    var CodeByExample = Backbone.View.extend({
+        tagName: "div",
+        // target: "#...",
+        template: _.template($("#code-editor-template").html()),
+        initialize: function(){
+
+        },
+        events: {
+            "click .copyCode": "copyCode"
+        },
+        copyCode: function(e) {
+            var currentEditor = ace.edit(this.editorId);
+            var currentValue = currentEditor.getSession().getValue();
+
+            var targetEditor = ace.edit("code-box");
+            targetEditor.getSession().setValue(currentValue)
+        },
+        render: function() {
+            var code = this.$el.text();
+            var editorId = createId();
+            this.editorId = editorId;
+
+            this.$el.html(this.template({
+                id: editorId,
+                code: _.escape(code)
+            }));
+
+            // Create the ace editor
+            var aceEditor = ace.edit(editorId);
+            aceEditor.setOptions({
+                maxLines: 15
+            });
+            aceEditor.setTheme("ace/theme/monokai");
+            aceEditor.getSession().setMode("ace/mode/javascript");
+
+            return this;
+        }
+    });
+
+    return CodeByExample;
+})();
+
+$("[code-example]").each(function() {
+    new CodeExample({el: $(this), target: "code-box"}).render();
+});
