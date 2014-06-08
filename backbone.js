@@ -200,12 +200,36 @@ var CodeExample = (function() {
         },
         render: function() {
             var code = this.$el.text();
+
+            // Attempts to shift all code to the left of the editor, ie removing the appropriate level of whitespace
+            var formattedCode = (function(code) {
+                var formattedCode = code.split("\n").reduce(function(prev, nextLine) {
+                    if(!prev.foundFirstLine) {
+                        var isBlank = nextLine.trim() === "";
+                        if(isBlank) {
+                            return prev;
+                        }
+
+                        prev.foundFirstLine = true;
+                        prev.leadingWhiteSpace = nextLine.length - nextLine.trim().length;
+                    }
+
+                    prev.combined += (nextLine.length > prev.leadingWhiteSpace)
+                            ? "\n" + nextLine.substr(prev.leadingWhiteSpace)
+                            : "\n" + nextLine;
+
+                    return prev;
+                }, {foundFirstLine: false, leadingWhiteSpace: 0, combined: ""}).combined;
+
+                return formattedCode;
+            })(code);
+
             var editorId = createId();
             this.editorId = editorId;
 
             this.$el.html(this.template({
                 id: editorId,
-                code: _.escape(code)
+                code: _.escape(formattedCode)
             }));
 
             // Create the ace editor
@@ -215,7 +239,6 @@ var CodeExample = (function() {
             });
             aceEditor.setTheme(editorStyle);
             aceEditor.getSession().setMode("ace/mode/javascript");
-
             return this;
         }
     });
@@ -237,9 +260,10 @@ $.fn.flash = function()
     return this;
 };
 
-$("[highlight-console]").each(function() {
+$("[highlight-target]").each(function() {
     $(this).click(function(e) {
         e.preventDefault();
-        $("#debug-window").flash();
+        var target = $(this).attr("highlight-target")
+        $(target).flash();
     })
 })

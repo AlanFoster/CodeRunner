@@ -99,9 +99,7 @@
             <span></span>
         </a>
     </div>
-    <div <%= "id='" + id + "'" %>>
-        <%= code %>
-    </div>
+    <div <%= "id='" + id + "'" %>><%= code %></div>
 </script>
 
 
@@ -142,26 +140,30 @@
 <div id="tutorial-box">
     <div class="col-md-4">
         <div class="page">
-            <h2>Welcome!</h2>
-            Let's learn how to code, click the next button to begin.
+            <h2>Welcome</h2>
+            Let's learn how to code, click the next button to begin!
         </div>
         <div class="page">
             <h2>Introduction</h2>
-            <div>Programming can be fun and challenging. Let's Look at the following code snippet</div>
+            <div>Programming can be fun and challenging. Let's look at the 'Hello World' example below</div>
 
             <div code-example>
                 log("Hello World")
             </div>
 
             <div>
-                You can copy this code int othe editor and press the run button to begin.
-                As we can see from the <a href="#" highlight-console>console output</a> it will say 'Hello World'
+                You can copy this code into the editor using the copy button provided above the code example.
+                When copied into the main editor, this code can be ran by pressing the <a href="#" highlight-target="#run-code">Run Code button </a>.
+            </div>
+            <br />
+            <div>
+                This code, when ran, will output the message 'Hello World' to the <a href="#" highlight-target="#debug-window">console output</a>.
             </div>
 
         </div>
         <div class="page">
             <h2>Creating Shapes</h2>
-            <div>You can also create shapes!</div>
+            <div>You can also create shapes! For instance you can create a Rectangle with the following code</div>
 
             <div code-example>
                 var rectangle = Rectangle({
@@ -170,7 +172,10 @@
                 });
             </div>
 
-            <div>You can also create circles with</div>
+            <div>
+                You can create various entities (shapes) such as Circles and Text.
+                These are shown within the <a href="#" class="view-api" title="View API" data-toggle="modal" data-target="#apiModal">API</a>.
+            </div>
 
             <div code-example>
                 var circle = Circle({
@@ -183,29 +188,84 @@
         </div>
 
         <div class="page">
-            <h2>Updating - Game loop</h2>
-            <div>Games often make use of a game loop. As part of this game loop you can logically update your entities. In this example we increase the location of our rectangle by 5 on each update.</div>
+            <h2>Loops</h2>
+
+            <div>Loops are able to run a block of code multiple times. For instance, this code can count up to 10</div>
 
             <div code-example>
+                var count = 0;
+
+                while(count < 10) {
+                    // Add one to the variable count
+                    count++;
+                    log("Adding 1 to the count " + count)
+                }
+
+                log("The final value is " + count)
+            </div>
+
+            <div>
+                Remember that these log messages will be added to the <a href="#" highlight-target="#debug-window">console</a>.
+            </div>
+
+        </div>
+
+        <div class="page">
+            <h2>Movement!</h2>
+            <div>Once an entity, such as a Circle is created, we can update its value within an 'update' function. As part of this update function we can logically update entities. In this example we increase the location of our circle by 5 on each update.</div>
+
+            <div code-example>
+                var velocity_x = 5;
+                var velocity_y = 5;
                 var circle = Circle({
                     x: 10,
                     y: 20
                 });
 
                 function update() {
-                    circle.x += 5;
-                    circle.y += 5;
+                    circle.x += velocity_x;
+                    circle.y += velocity_y;
                 }
             </div>
 
-            <div>We could update the code to to make sure it always stays within the bounds of the screen</div>
+            <div>
+                We could update the code to to make sure it always stays within the bounds of the screen.
+                The size of the canvas is accessible via the world object.
+            </div>
+
+            <div code-example>
+                var WORLD_WIDTH = world.width;
+                var WORLD_HEIGHT = world.height;
+
+                var velocity_x = 5;
+                var velocity_y = 5;
+
+                var circle = Circle({
+                    x: 10,
+                    y: 20,
+                    radius:10
+                });
+
+                function update() {
+                    circle.x += velocity_x;
+                    circle.y += velocity_y;
+
+                    if(circle.x < 0 || circle.x > WORLD_WIDTH) {
+                        velocity_x *= -1;
+                    }
+
+                    if(circle.y < 0 || circle.y > WORLD_HEIGHT) {
+                        velocity_y *= -1;
+                    }
+                }
+            </div>
 
         </div>
 
         <div class="page">
             <h2>The End</h2>
-            <div>We hope you enjoyed yourself.</div>
-            <div>Your final code should look like:</div>
+            <div>We hope you enjoyed yourself. It is possible to use all of the previous steps and create both basic and advanced programs!</div>
+            <div>Here is a simple game of pong!</div>
             <div code-example>
                 log("Started Game!");
 
@@ -342,6 +402,7 @@
 
     <div>
         <a href="#"
+           id="run-code"
            intepreter-runner
            intepreter-code-box="code-box"
            intepreter-target="#code-result"

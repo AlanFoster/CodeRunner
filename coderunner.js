@@ -188,9 +188,6 @@ var codeRunner = (function (codeRunner) {
             var mappedDefaults = mapDefaults(details.defaults);
 
             var F = function(attrs){
-			
-			console.log(mappedDefaults)
-			
                 //logger.debug("Creating a new : " + name);
                 bindProperties(this, mappedDefaults, attrs);
                 //logger.debug("Created a new : " + name);
