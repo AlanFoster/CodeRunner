@@ -138,7 +138,7 @@ var codeRunner = (function (codeRunner) {
 
     var Entity = (function(availableEntities, worldEntities){
         function bindProperties(obj, defaults, attributes) {
-            var props = $.extend(defaults, attributes)
+            var props = $.extend({}, defaults, attributes)
 
             for (var prop in props) {
                 if (!props.hasOwnProperty(prop)) continue;
@@ -188,6 +188,9 @@ var codeRunner = (function (codeRunner) {
             var mappedDefaults = mapDefaults(details.defaults);
 
             var F = function(attrs){
+			
+			console.log(mappedDefaults)
+			
                 //logger.debug("Creating a new : " + name);
                 bindProperties(this, mappedDefaults, attrs);
                 //logger.debug("Created a new : " + name);

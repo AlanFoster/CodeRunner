@@ -19,14 +19,17 @@ $(function () {
 
             // Bind a cancel button
             var cancelId = runner.attr("intepreter-stop");
-            $(cancelId).click(function () {
+            $(cancelId).click(function (e) {
+                e.preventDefault();
                 environment.destroy(true);
             });
 
             var codeBoxId = runner.attr("intepreter-code-box");
 
             runner.click((function (codeBoxId, debugId, environment) {
-                return function () {
+                return function (e) {
+                    e.preventDefault();
+
                     environment.destroy();
                     environment.setUp();
 

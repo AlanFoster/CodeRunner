@@ -4,28 +4,73 @@
     <meta charset="UTF-8">
     <title>Document</title>
 
+    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="style.css" rel="stylesheet"/>
 </head>
 <body>
+
+
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <!-- Toggle bar which appears when less than the appropriate size -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#/">Try It</a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Examples <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-header">Pong</li>
+                        <li><a href="#">You're reading it!</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" title="View API">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
 
 <script id="api-detail" type="text/template">
     <div>
         <!-- TODO Is there a more idiomatic way of dealing with this? -->
         <% if(name == "Available Entities") { %>
-
+            <%= description %>
             <% _.each(todoNameMe, function(value, key) { %>
                 <div>
                     <h3><%= key %></h3>
+                    <%= value.description %>
                     <h4>Available Attributes</h4>
-                    <% _.each(value.defaults, function(value, key) { %>
                     <div>
-                        <strong><%= key %></strong>
-                        <div style="margin-left:20px">
-                            <div>- Description: <%= value.description %></div>
-                            <div>- Default Value: <%= value.default %></div>
-                        </div>
+                        <table class="table table-striped">
+                            <thead>
+                            <td>Name</td>
+                            <td>Description</td>
+                            <td>Default</td>
+                            </thead>
+                            <% _.each(value.defaults, function(value, key) { %>
+                                    <tr>
+                                        <td><%= key %></td>
+                                        <td><%= value.description %></td>
+                                        <td><%= value.default %></td>
+                                    </tr>
+                            <% }) %>
+                        </table>
                     </div>
-                    <% }) %>
+
                 </div>
             <% }) %>
         <% } %>
@@ -49,7 +94,12 @@
 </script>
 
 <script id="code-editor-template" type="text/template">
-    <input type="button" class="copyCode" value="copy"/>
+    <div class="text-right">
+        <a title="View API" class="copyCode" title="Copy-Code">
+            <span class="glyphicon glyphicon-pencil"></span>
+            <span></span>
+        </a>
+    </div>
     <div <%= "id='" + id + "'" %>>
         <%= code %>
     </div>
@@ -57,366 +107,303 @@
 
 
 <script id="api-overview" type="text/template">
-    <div style="border: 1px solid red; margin: 5px;">
-        <%= name %> - <%= description %>
-        <input type="button" value="View" class="more" />
-        <!-- Lazily populates -->
-        <div class="more-detail">
-
+    <div class="panel panel-default">
+        <div class="panel-heading more">
+            <%= name %> - <%= description %>
+        </div>
+        <!-- Lazily populated -->
+        <div class="panel-body more-detail">
         </div>
     </div>
 </script>
 
 <h3>Tutorial</h3>
 <div id="tutorial-box">
-    <div>
-        <input type="button" class="previousPage" value="previous"/>
-        <input type="button" class="nextPage" value="next"/>
-    </div>
-    <div class="page">
-        <h2>Welcome!</h2>
-        Let's learn how to code, click the next button to begin.
-    </div>
-    <div class="page">
-        <h2>Introduction</h2>
-        <div>Programming can be fun and challenging. Let's Look at the following code snippet -</div>
-
-        <div code-example>
-            log("Hello World")
+    <div class="col-md-4">
+        <div class="page">
+            <h2>Welcome!</h2>
+            Let's learn how to code, click the next button to begin.
         </div>
-    </div>
-    <div class="page">
-        <h2>Creating Shapes</h2>
-        <div>You can also create shapes!</div>
+        <div class="page">
+            <h2>Introduction</h2>
+            <div>Programming can be fun and challenging. Let's Look at the following code snippet</div>
 
-        <div code-example>
-            var rectangle = Rectangle({
-                x: 10,
-                y: 20
-            });
+            <div code-example>
+                log("Hello World")
+            </div>
+
+            <div>
+                You can copy this code int othe editor and press the run button to begin.
+                As we can see from the <a href="#" highlight-console>console output</a> it will say 'Hello World'
+            </div>
+
+        </div>
+        <div class="page">
+            <h2>Creating Shapes</h2>
+            <div>You can also create shapes!</div>
+
+            <div code-example>
+                var rectangle = Rectangle({
+                    x: 10,
+                    y: 20
+                });
+            </div>
+
+            <div>You can also create circles with</div>
+
+            <div code-example>
+                var circle = Circle({
+                    x: 50,
+                    y: 50,
+                    color: Colors.RED
+                });
+            </div>
+
         </div>
 
-        <div>You can also create circles with</div>
+        <div class="page">
+            <h2>Updating - Game loop</h2>
+            <div>Games often make use of a game loop. As part of this game loop you can logically update your entities. In this example we increase the location of our rectangle by 5 on each update.</div>
 
-        <div code-example>
-            var circle = Circle({
-                x: 50,
-                y: 50,
-                color: Colors.RED
-            });
+            <div code-example>
+                var circle = Circle({
+                    x: 10,
+                    y: 20
+                    });
+
+                    function update() {
+                    circle.x += 5;
+                    circle.y += 5;
+                }
+            </div>
+
+            <div>We could update the code to to make sure it always stays within the bounds of the screen</div>
+
         </div>
 
-    </div>
-    <div class="page">
-        <h2>The End</h2>
-        <div>We hope you enjoyed yourself.</div>
-        <div>Your final code should look like:</div>
-        <div code-example>
-            log("Started Game!");
+        <div class="page">
+            <h2>The End</h2>
+            <div>We hope you enjoyed yourself.</div>
+            <div>Your final code should look like:</div>
+            <div code-example>
+                log("Started Game!");
 
-            world.color = Colors.GREY;
-            var WORLD_WIDTH = world.width;
-            var WORLD_HEIGHT = world.height;
+                world.color = Colors.GREY;
+                var WORLD_WIDTH = world.width;
+                var WORLD_HEIGHT = world.height;
 
-            var playerPaddle = Rectangle({
-                x: 10, y: 10,
-                width: 20, height: 100,
-                color: Colors.GREEN,
-                velocity: 10
-            });
+                var playerPaddle = Rectangle({
+                    x: 10, y: 10,
+                    width: 20, height: 80,
+                    color: Colors.GREEN,
+                    velocity: 10
+                });
 
-            // Keeping track of the scores
-            var playerScore = 0;
-            var computerScore = 0;
+                // Keeping track of the scores
+                var playerScore = 0;
+                var computerScore = 0;
 
-            var score = Text({
-                x: (WORLD_WIDTH / 2) - 80,
-                y: 24,
-                text: "Player " + playerScore + " - Computers " + computerScore
-            });
+                var score = Text({
+                    x: (WORLD_WIDTH / 2) - 80,
+                    y: 24,
+                    text: "Player " + playerScore + " - Computers " + computerScore
+                });
 
-            var computerPaddle = Rectangle({
-                x: WORLD_WIDTH - 30, y: 10,
-                width: 20, height: 100,
-                color: Colors.GREEN,
-                velocity: 8
-            });
+                var computerPaddle = Rectangle({
+                    x: WORLD_WIDTH - 30, y: 10,
+                    width: 20, height: 80,
+                    color: Colors.GREEN,
+                    velocity: 6
+                });
 
-            var ball_radius = 10;
-            var ball_velocity = 10;
-            var ball = Circle({
-                x: (WORLD_WIDTH / 2) - (ball_radius / 2),
-                y: (WORLD_HEIGHT / 2) - (ball_radius / 2),
-                radius: ball_radius,
-                x_velocity: -ball_velocity,
-                y_velocity: ball_velocity
-            });
+                var ball_radius = 10;
+                var ball_velocity = 10;
+                var ball = Circle({
+                    x: (WORLD_WIDTH / 2) - (ball_radius / 2),
+                    y: (WORLD_HEIGHT / 2) - (ball_radius / 2),
+                    radius: ball_radius,
+                    x_velocity: -ball_velocity,
+                    y_velocity: ball_velocity
+                });
 
-            // Start the ball in the middle
-            resetBall();
+                // Start the ball in the middle
+                resetBall();
 
-            function update() {
-                // Update the ball's position
-                updateBall();
+                function update() {
+                    // Update the ball's position
+                    updateBall();
 
-                // Check to see if anyone has one, and restart the game if they have
-                checkWinners();
+                    // Check to see if anyone has one, and restart the game if they have
+                    checkWinners();
 
-                // Human Controlling
-                movePlayer();
+                    // Human Controlling
+                    movePlayer();
 
-                // Computer AI Mechanism for the paddle
-                moveComputer();
-            }
-
-            function movePlayer() {
-                if (keysDown.contains(Keys.UP) && (playerPaddle.y) > 0) {
-                    playerPaddle.y -= playerPaddle.velocity;
+                    // Computer AI Mechanism for the paddle
+                    moveComputer();
                 }
 
-                if (keysDown.contains(Keys.DOWN) && (playerPaddle.y + playerPaddle.height) < WORLD_HEIGHT) {
-                    playerPaddle.y += playerPaddle.velocity;
-                }
-            }
-
-            function moveComputer() {
-                var centerOfPaddle = computerPaddle.y + (computerPaddle.height / 2)
-
-                // Only begin to move the computer if the ball is more than half way across the game
-                if(ball.x > WORLD_WIDTH / 2) {
-                    if (ball.y > centerOfPaddle) {
-                        computerPaddle.y += computerPaddle.velocity;
-                    } else {
-                        computerPaddle.y -= computerPaddle.velocity;
-                    }
-                }
-            }
-
-            function updateBall() {
-                // Update the ball position
-                ball.x += ball.x_velocity;
-                ball.y += ball.y_velocity;
-
-                // Check if we need to bounce on the top or bottom
-                if(ball.y <= 0 || ball.y >= WORLD_HEIGHT){
-                    ball.y_velocity *= - 1;
-                }
-
-                // Check if we have bounced off a paddle or computer
-                if(ball.collidesWith(playerPaddle) || ball.collidesWith(computerPaddle) ) {
-                    ball.x_velocity *= -1;
-                }
-            }
-
-            function checkWinners() {
-                var ballPastPlayer = ball.x < 0;
-                var ballPastComputer = ball.x > WORLD_WIDTH;
-                if (ballPastPlayer|| ballPastComputer) {
-                    // Decide who gets the points!
-                    if(ballPastPlayer) {
-                        computerScore++;
-                    } else if(ballPastComputer) {
-                        playerScore++;
+                function movePlayer() {
+                    if (keysDown.contains(Keys.UP) && (playerPaddle.y) > 0) {
+                        playerPaddle.y -= playerPaddle.velocity;
                     }
 
-                    // Update the score text
-                    score.text = "Player " + playerScore + " - Computers " + computerScore;
-                    resetBall();
+                    if (keysDown.contains(Keys.DOWN) && (playerPaddle.y + playerPaddle.height) < WORLD_HEIGHT) {
+                        playerPaddle.y += playerPaddle.velocity;
+                    }
                 }
-            }
 
-            function resetBall() {
-                // restart the ball position in the center of the world
-                ball.x = (WORLD_WIDTH / 2) - (ball_radius / 2);
-                ball.y = (WORLD_HEIGHT / 2) - (ball_radius / 2);
+                function moveComputer() {
+                    var centerOfPaddle = computerPaddle.y + (computerPaddle.height / 2)
 
-                ball.x_velocity = -ball_velocity;
-                ball.y_velocity = ball_velocity;
-            }
+                    // Only begin to move the computer if the ball is more than half way across the game
+                    if (ball.x > WORLD_WIDTH / 2) {
+                        if (ball.y > centerOfPaddle) {
+                            computerPaddle.y += computerPaddle.velocity;
+                        } else {
+                            computerPaddle.y -= computerPaddle.velocity;
+                        }
+                    }
+                }
+
+                function updateBall() {
+                    // Update the ball position
+                    ball.x += ball.x_velocity;
+                    ball.y += ball.y_velocity;
+
+                    // Check if we need to bounce on the top or bottom
+                    if (ball.y <= 0 || ball.y >= WORLD_HEIGHT) {
+                        ball.y_velocity *= -1;
+                    }
+
+                    // Check if we have bounced off a paddle or computer
+                    if (ball.collidesWith(playerPaddle) || ball.collidesWith(computerPaddle)) {
+                        ball.x_velocity *= -1;
+                    }
+                }
+
+                function checkWinners() {
+                    var ballPastPlayer = ball.x < 0;
+                    var ballPastComputer = ball.x > WORLD_WIDTH;
+                    if (ballPastPlayer || ballPastComputer) {
+                        // Decide who gets the points!
+                        if (ballPastPlayer) {
+                            computerScore++;
+                        } else if (ballPastComputer) {
+                            playerScore++;
+                        }
+
+                        // Update the score text
+                        score.text = "Player " + playerScore + " - Computers " + computerScore;
+                        resetBall();
+                    }
+                }
+
+                function resetBall() {
+                    // restart the ball position in the center of the world
+                    ball.x = (WORLD_WIDTH / 2) - (ball_radius / 2);
+                    ball.y = (WORLD_HEIGHT / 2) - (ball_radius / 2);
+
+                    ball.x_velocity = -ball_velocity;
+                    ball.y_velocity = ball_velocity;
+                }
+            </div>
+        </div>
+
+        <div class="text-center" style="margin-top: 20px">
+            <input type="button" class="btn btn-default previousPage" value="previous"/>
+            <input type="button" class="btn btn-default nextPage" value="next"/>
         </div>
     </div>
 </div>
+
+<div class="col-md-8">
+
+    <div>
+        <a href="#"
+           intepreter-runner
+           intepreter-code-box="code-box"
+           intepreter-target="#code-result"
+           intepreter-debugger="#debug-window"
+           intepreter-stop="#stop">
+            <span class="glyphicon glyphicon-refresh"></span>
+            <span>Run Code </span>
+        </a>
+
+        <a href="#" id="stop">
+            <span class="glyphicon glyphicon-exclamation-sign red"></span>
+            <span>Stop Code</span>
+        </a>
+    </div>
+
+
+    <div>
+        <!-- Editor and code box are synced -->
+        <div id="code-box">
+
+        </div>
+    </div>
+
+    <div>
+        <div class="text-center">Canvas</div>
+        <div id="code-result" class="environment">
+            Waiting for new program...
+        </div>
+    </div>
+
+    <div>
+        <div class="text-center">Log output</div>
+        <div id="debug-window" class="logging-container">
+            Waiting for new program...
+        </div>
+    </div>
+
+</div>
+
+
 
 <div>
     <h3>Functions</h3>
     <div intepreter-api>
 
     </div>
+
 </div>
 
-<div>
-    <input type="button" value="Run Code"
-           intepreter-runner
-           intepreter-code-box="code-box"
-           intepreter-target="#code-result"
-           intepreter-debugger="#debug-window"
-           intepreter-stop="#stop"
-            />
-    <input type="button" value="Stop Running" id="stop"/>
-</div>
-
-
-<div>
-    <!-- Editor and code box are synced -->
-    <div id="code-box">
-log("Started Game!");
-
-world.color = Colors.GREY;
-var WORLD_WIDTH = world.width;
-var WORLD_HEIGHT = world.height;
-
-var playerPaddle = Rectangle({
-    x: 10, y: 10,
-    width: 20, height: 100,
-    color: Colors.GREEN,
-    velocity: 10
-});
-
-// Keeping track of the scores
-var playerScore = 0;
-var computerScore = 0;
-
-var score = Text({
-    x: (WORLD_WIDTH / 2) - 80,
-    y: 24,
-    text: "Player " + playerScore + " - Computers " + computerScore
-});
-
-var computerPaddle = Rectangle({
-    x: WORLD_WIDTH - 30, y: 10,
-    width: 20, height: 100,
-    color: Colors.GREEN,
-    velocity: 8
-});
-
-var ball_radius = 10;
-var ball_velocity = 10;
-var ball = Circle({
-    x: (WORLD_WIDTH / 2) - (ball_radius / 2),
-    y: (WORLD_HEIGHT / 2) - (ball_radius / 2),
-    radius: ball_radius,
-    x_velocity: -ball_velocity,
-    y_velocity: ball_velocity
-});
-
-// Start the ball in the middle
-resetBall();
-
-function update() {
-    // Update the ball's position
-    updateBall();
-
-    // Check to see if anyone has one, and restart the game if they have
-    checkWinners();
-
-    // Human Controlling
-    movePlayer();
-
-    // Computer AI Mechanism for the paddle
-    moveComputer();
-}
-
-function movePlayer() {
-    if (keysDown.contains(Keys.UP) && (playerPaddle.y) > 0) {
-        playerPaddle.y -= playerPaddle.velocity;
-    }
-
-    if (keysDown.contains(Keys.DOWN) && (playerPaddle.y + playerPaddle.height) < WORLD_HEIGHT) {
-        playerPaddle.y += playerPaddle.velocity;
-    }
-}
-
-function moveComputer() {
-    var centerOfPaddle = computerPaddle.y + (computerPaddle.height / 2)
-
-    // Only begin to move the computer if the ball is more than half way across the game
-    if(ball.x > WORLD_WIDTH / 2) {
-        if (ball.y > centerOfPaddle) {
-            computerPaddle.y += computerPaddle.velocity;
-        } else {
-            computerPaddle.y -= computerPaddle.velocity;
-        }
-    }
-}
-
-function updateBall() {
-    // Update the ball position
-    ball.x += ball.x_velocity;
-    ball.y += ball.y_velocity;
-
-    // Check if we need to bounce on the top or bottom
-    if(ball.y <= 0 || ball.y >= WORLD_HEIGHT){
-        ball.y_velocity *= - 1;
-    }
-
-    // Check if we have bounced off a paddle or computer
-    if(ball.collidesWith(playerPaddle) || ball.collidesWith(computerPaddle) ) {
-        ball.x_velocity *= -1;
-    }
-}
-
-function checkWinners() {
-    var ballPastPlayer = ball.x < 0;
-    var ballPastComputer = ball.x > WORLD_WIDTH;
-    if (ballPastPlayer|| ballPastComputer) {
-        // Decide who gets the points!
-        if(ballPastPlayer) {
-            computerScore++;
-        } else if(ballPastComputer) {
-            playerScore++;
-        }
-
-        // Update the score text
-        score.text = "Player " + playerScore + " - Computers " + computerScore;
-        resetBall();
-    }
-}
-
-function resetBall() {
-    // restart the ball position in the center of the world
-    ball.x = (WORLD_WIDTH / 2) - (ball_radius / 2);
-    ball.y = (WORLD_HEIGHT / 2) - (ball_radius / 2);
-
-    ball.x_velocity = -ball_velocity;
-    ball.y_velocity = ball_velocity;
-}
-    </div>
-</div>
-
-<div>
-    [Result]
-    <div id="code-result" class="environment">
-        Waiting for new program...
-    </div>
-</div>
-
-<div>
-    [Logging Window]
-    <div id="debug-window" class="logging-container">
-        Waiting for new program...
-    </div>
-</div>
+</body>
+<script>
+    var editorStyle = "ace/theme/dawn";
+</script>
 
 <script src="bower_components/jquery/dist/jquery.min.js" type="text/javascript"></script>
+<script src="bower_components/jquery-ui/ui/minified/jquery-ui.min.js" type="text/javascript"></script>
 <script src="bower_components/underscore/underscore.js" type="text/javascript" charset="utf-8"></script>
 <script src="bower_components/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 <script src="bower_components/backbone/backbone.js" type="text/javascript" charset="utf-8"></script>
+<script src="bower_components/bootstrap/dist/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
 <script>
+    localStorage.latestCode = localStorage.latestCode || "";
+    $("#code-box").html(localStorage.latestCode);
+
     var editor = ace.edit("code-box");
-    editor.setTheme("ace/theme/monokai");
+    editor.setTheme(editorStyle);
     editor.getSession().setMode("ace/mode/javascript");
+
+
+    editor.getSession().on('change', function(e) {
+        localStorage.latestCode = editor.getSession().getValue();
+    });
 </script>
 <script src="coderunner.js"></script>
 <script src="binding.js"></script>
 <script src="backbone.js"></script>
 <script>
     // Fake a click of the run button for debugging purposes
-    setTimeout(function () {
-        var runners = document.querySelectorAll("[intepreter-runner]");
-        [].forEach.bind(runners, function (runner) {
-            runner.click()
-        })()
-    }, 100);
+    /*setTimeout(function () {
+     var runners = document.querySelectorAll("[intepreter-runner]");
+     [].forEach.bind(runners, function (runner) {
+     runner.click()
+     })()
+     }, 100);*/
 </script>
-</body>
 </html>

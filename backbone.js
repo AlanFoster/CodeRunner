@@ -1,4 +1,3 @@
-
 var TutorialView = Backbone.View.extend({
     initialize: function() {
         var pages = this.$el.find(".page");
@@ -9,7 +8,8 @@ var TutorialView = Backbone.View.extend({
         this.animating = false;
     },
     render: function() {
-        this.$el.find(".page").eq(this.currentIndex).show();
+        this.showPage(0);
+
         return this;
     },
     events: {
@@ -37,11 +37,17 @@ var TutorialView = Backbone.View.extend({
 
         this.animating = true;
 
+        var isPreviousAllowed = newIndex > 0;
+        this.$el.find(".previousPage")[isPreviousAllowed ? "show" : "hide"]();
+
+        var isNextAllowed = newIndex != (this.pages.length - 1);
+        this.$el.find(".nextPage")[isNextAllowed ? "show" : "hide"]();
+
         var oldIndex = this.currentIndex;
         this.currentIndex = newIndex;
         // TODO - Perhaps we should be bound to a backbone model to get these events for free?
         this.trigger("change:currentIndex", newIndex);
-        var pages = this.$el.find(".page")
+        var pages = this.$el.find(".page");
 
         var self = this;
         pages.eq(oldIndex).fadeOut(function(){
@@ -105,8 +111,10 @@ var ApiOverview = Backbone.View.extend({
         var rendered = this.template(
             _.extend(this.model.toJSON(), { detailOpened: this.detailOpened})
         );
-        this.$el.html(rendered);
+        // Replace the existing $el, so we don't have a wrapped div.
+        this.setElement(rendered);
 
+        this.$el.find(".more-detail").hide();
         this.renderDetail(false);
 
         return this;
@@ -131,10 +139,11 @@ var ApiOverview = Backbone.View.extend({
         "click .more": "viewMore"
     },
     viewMore: function(e) {
+        e.preventDefault();
         var newValue = !this.detailOpened;
         this.renderDetail(newValue);
     }
-})
+});
 
 var ApiView = Backbone.View.extend({
     // collection: {},
@@ -151,16 +160,14 @@ var ApiView = Backbone.View.extend({
         });
         return this;
     }
-})
-
+});
 
 var apiView = new ApiView({
     collection: apiTest,
     el: "[intepreter-api]"
-})
+});
 
 apiView.render();
-
 
 var CodeExample = (function() {
     var createId = (function() {
@@ -186,7 +193,10 @@ var CodeExample = (function() {
             var currentValue = currentEditor.getSession().getValue();
 
             var targetEditor = ace.edit("code-box");
-            targetEditor.getSession().setValue(currentValue)
+            var targetSession = targetEditor.getSession();
+            targetSession.setValue(currentValue)
+            targetEditor.focus();
+            targetEditor.navigateFileEnd();
         },
         render: function() {
             var code = this.$el.text();
@@ -203,7 +213,7 @@ var CodeExample = (function() {
             aceEditor.setOptions({
                 maxLines: 15
             });
-            aceEditor.setTheme("ace/theme/monokai");
+            aceEditor.setTheme(editorStyle);
             aceEditor.getSession().setMode("ace/mode/javascript");
 
             return this;
@@ -216,3 +226,20 @@ var CodeExample = (function() {
 $("[code-example]").each(function() {
     new CodeExample({el: $(this), target: "code-box"}).render();
 });
+
+$.fn.flash = function()
+{
+    var originalBg = this.css("backgroundColor") || "#FFFFFF";
+    this
+        .css("background-color", "#D3F5E5")
+        .animate({backgroundColor: originalBg}, 700);
+
+    return this;
+};
+
+$("[highlight-console]").each(function() {
+    $(this).click(function(e) {
+        e.preventDefault();
+        $("#debug-window").flash();
+    })
+})
