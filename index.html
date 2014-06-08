@@ -8,6 +8,28 @@
 </head>
 <body>
 
+<div id="tutorial-box">
+    <div>
+        <input type="button" class="previousPage" value="previous"/>
+        <input type="button" class="nextPage" value="next"/>
+    </div>
+    <div class="page">
+        <h2>Welcome!</h2>
+        Let's learn how to code, click the next button to begin.
+    </div>
+    <div class="page">
+        <h2>Introduction</h2>
+        <div>Programming can be fun and challenging. Let's Look at the following code snippet -</div>
+
+        <div code-example>
+            log("Hello World")
+        </div>
+    </div>
+    <div class="page">
+        Third Page
+    </div>
+</div>
+
 <div>
     <input type="button" value="Run Code"
            intepreter-runner
@@ -167,7 +189,9 @@ function resetBall() {
 </div>
 
 <script src="bower_components/jquery/dist/jquery.min.js" type="text/javascript"></script>
+<script src="bower_components/underscore/underscore.js" type="text/javascript" charset="utf-8"></script>
 <script src="bower_components/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="bower_components/backbone/backbone.js" type="text/javascript" charset="utf-8"></script>
 <script>
     var editor = ace.edit("code-box");
     editor.setTheme("ace/theme/monokai");
@@ -175,6 +199,7 @@ function resetBall() {
 </script>
 <script src="coderunner.js"></script>
 <script src="binding.js"></script>
+<script src="backbone.js"></script>
 <script>
     // Fake a click of the run button for debugging purposes
     setTimeout(function () {
