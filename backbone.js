@@ -77,3 +77,86 @@ tutorialView.on("change:currentIndex", function(newIndex){
 
 // Render our views
 tutorialView.render();
+
+
+// Try to bind the public API
+var ApiModel = Backbone.Model.extend({
+    defaults: {
+        name: "Not Set",
+        description: "",
+        todoNameMe: {}
+    }
+});
+var ApiCollection = Backbone.Collection.extend({
+    model: ApiModel
+});
+
+var apiTest = new ApiCollection(codeRunner.api);
+
+
+var ApiOverview = Backbone.View.extend({
+    template: _.template($("#api-overview").html()),
+    templateDetail: _.template($("#api-detail").html()),
+    initialize: function(){
+        this.detailOpened = false;
+        this.renderedDetail = false;
+    },
+    render: function() {
+        var rendered = this.template(
+            _.extend(this.model.toJSON(), { detailOpened: this.detailOpened})
+        );
+        this.$el.html(rendered);
+
+        this.renderDetail(false);
+
+        return this;
+    },
+    renderDetail: function(newValue) {
+        if(newValue === this.detailOpened) return;
+
+        if(!this.renderedDetail && newValue) {
+            this.renderedDetail = true;
+            var detail = this.templateDetail(this.model.toJSON());
+            this.$el.find(".more-detail").html(detail);
+        }
+
+        if(this.renderedDetail) {
+            var toggleValue = ["hide", "show"][+newValue];
+            this.$el.find(".more-detail")[toggleValue]();
+        }
+
+        this.detailOpened = newValue;
+    },
+    events: {
+        "click .more": "viewMore"
+    },
+    viewMore: function(e) {
+        var newValue = !this.detailOpened;
+        this.renderDetail(newValue);
+    }
+})
+
+var ApiView = Backbone.View.extend({
+    // collection: {},
+    initialize: function() {
+
+    },
+    render: function() {
+        var self = this
+        _.each(this.collection.models, function(item) {
+            var apiExample = new ApiOverview({
+                model: item
+            })
+            self.$el.append(apiExample.render().el)
+        });
+        return this;
+    }
+})
+
+
+var apiView = new ApiView({
+    collection: apiTest,
+    el: "[intepreter-api]"
+})
+
+apiView.render();

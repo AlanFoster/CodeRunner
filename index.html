@@ -8,6 +8,58 @@
 </head>
 <body>
 
+<script id="api-detail" type="text/template">
+    <div>
+        <!-- TODO Is there a more idiomatic way of dealing with this? -->
+        <% if(name == "Available Entities") { %>
+
+            <% _.each(todoNameMe, function(value, key) { %>
+                <div>
+                    <h3><%= key %></h3>
+                    <h4>Available Attributes</h4>
+                    <% _.each(value.defaults, function(value, key) { %>
+                    <div>
+                        <strong><%= key %></strong>
+                        <div style="margin-left:20px">
+                            <div>- Description: <%= value.description %></div>
+                            <div>- Default Value: <%= value.default %></div>
+                        </div>
+                    </div>
+                    <% }) %>
+                </div>
+            <% }) %>
+        <% } %>
+
+        <% if(name == "Colors") { %>
+            <% _.each(todoNameMe, function(value, key) { %>
+                <div>
+                    <%= key %> - <%= value %>
+                </div>
+            <% }) %>
+        <% } %>
+
+        <% if(name == "Keys") { %>
+            <% _.each(todoNameMe, function(value, key) { %>
+            <div>
+                <%= key %>
+            </div>
+            <% }) %>
+        <% } %>
+    </div>
+</script>
+
+<script id="api-overview" type="text/template">
+    <div style="border: 1px solid red; margin: 5px;">
+        <%= name %> - <%= description %>
+        <input type="button" value="View" class="more" />
+        <!-- Lazily populates -->
+        <div class="more-detail">
+
+        </div>
+    </div>
+</script>
+
+<h3>Tutorial</h3>
 <div id="tutorial-box">
     <div>
         <input type="button" class="previousPage" value="previous"/>
@@ -26,7 +78,25 @@
         </div>
     </div>
     <div class="page">
-        Third Page
+        <h2>Creating Shapes</h2>
+        <div>You can also create shapes!</div>
+
+        <div code-example>
+            var rectangle = Rectangle({
+                x: 10,
+                y: 20
+            })
+        </div>
+
+
+        <div code-example>
+            var circle = circle({
+                x: 50,
+                y: 50,
+                color: Colors.RED
+            })
+        </div>
+
     </div>
 </div>
 
@@ -41,8 +111,11 @@
     <input type="button" value="Stop Running" id="stop"/>
 </div>
 
-<div intepreter-api>
+<div>
+    <h3>Functions</h3>
+    <div intepreter-api>
 
+    </div>
 </div>
 
 

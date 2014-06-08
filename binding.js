@@ -39,15 +39,7 @@ $(function () {
         });
     }
 
-    function bindApi() {
-        $("[intepreter-api]").each(function() {
-            $(this).append("TODO Bind Available API")
-        })
-    }
-
-
     bindCodeRunners();
-    bindApi();
 });
 
 
