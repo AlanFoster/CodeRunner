@@ -5,7 +5,7 @@
     <title>Code Editor</title>
 
     <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"/>
-    <link href="style.css" rel="stylesheet"/>
+    <link href="css/style.css" rel="stylesheet"/>
 </head>
 <body>
 
@@ -273,28 +273,28 @@
                 var WORLD_WIDTH = world.width;
                 var WORLD_HEIGHT = world.height;
 
+                // Keeping track of the scores
+                var playerScore = 0;
+                var computerScore = 0;
+
                 var playerPaddle = Rectangle({
-                    x: 10, y: 10,
+                    x: 10, y: (WORLD_HEIGHT / 2) - (80 / 2),
                     width: 20, height: 80,
                     color: Colors.GREEN,
                     velocity: 10
                 });
 
-                // Keeping track of the scores
-                var playerScore = 0;
-                var computerScore = 0;
+                var computerPaddle = Rectangle({
+                    x: WORLD_WIDTH - 30, y: (WORLD_HEIGHT / 2) - (80 / 2),
+                    width: 20, height: 80,
+                    color: Colors.GREEN,
+                    velocity: 6
+                });
 
                 var score = Text({
                     x: (WORLD_WIDTH / 2) - 80,
                     y: 24,
                     text: "Player " + playerScore + " - Computers " + computerScore
-                });
-
-                var computerPaddle = Rectangle({
-                    x: WORLD_WIDTH - 30, y: 10,
-                    width: 20, height: 80,
-                    color: Colors.GREEN,
-                    velocity: 6
                 });
 
                 var ball_radius = 10;
@@ -367,6 +367,8 @@
                     var ballPastPlayer = ball.x < 0;
                     var ballPastComputer = ball.x > WORLD_WIDTH;
                     if (ballPastPlayer || ballPastComputer) {
+                        log("Game Lost!")
+
                         // Decide who gets the points!
                         if (ballPastPlayer) {
                             computerScore++;
@@ -465,9 +467,9 @@
         localStorage.latestCode = editor.getSession().getValue();
     });
 </script>
-<script src="coderunner.js"></script>
-<script src="binding.js"></script>
-<script src="backbone.js"></script>
+<script src="js/coderunner.js"></script>
+<script src="js/binding.js"></script>
+<script src="js/backbone.js"></script>
 <script>
     // Fake a click of the run button for debugging purposes
     /*setTimeout(function () {
